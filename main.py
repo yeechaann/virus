@@ -28,7 +28,8 @@ lcd_backlight = 2
 lcd_columns = 16
 lcd_rows = 2
 
-max_count = 5
+max_count = 100
+show_count = 0
 
 lcd = LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_columns,
                            lcd_rows, lcd_backlight)
@@ -41,25 +42,25 @@ while True:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)   # camera setting
 
     hands = hand_cascade.detectMultiScale(gray, 1.3, 5)
-    print(hands)
     
     if type(hands) == np.ndarray:
         lcd.clear()
         CNT = CNT +1
+        lcd.set_cursor(2,0)
+        lcd.message("[")
+        lcd.set_cursor(13,0)
+        lcd.message("]")
         lcd.set_cursor(3,0)
-        lcd.message('0'*(10-((int((CNT / max_count) * 100)//10))))
-        lcd.set_cursor(3,1)
-        lcd.message('0'*(10-((int((CNT / max_count) * 100)//10))))
-        
+        lcd.message('-'*(10-((int((CNT / max_count) * 100)//10))))
+        lcd.set_cursor(6,1)
+        show_count = 100-(int((CNT / max_count) * 100))
+        lcd.message(f"{str(show_count)}%")
         
         p.start(2.5)
         p.ChangeDutyCycle(5)
         time.sleep(0.5)
-        p.ChangeDutyCycle(15)
+        p.ChangeDutyCycle(18)
         time.sleep(0.5)
-        
-
-        
         
         
         if CNT >= max_count:
@@ -67,10 +68,8 @@ while True:
             lcd.message("Please Replace")
             break;
         
-        time.sleep(1)
+        time.sleep(2)
             
-
-
 GPIO.cleanup()
 cap.release()
 cv2.destroyAllWindows()
